@@ -5,25 +5,29 @@ Suite Setup      Setup Test Environment
 Suite Teardown   Desconectar a api
 
 *** Test Cases ***
-Cenário: Realizar login com credenciais válidas
+Cenário 01: Realizar login com credenciais válidas
+    [Documentation]    Esse teste realiza a autenticação
     [Tags]    @auth
     Dado que o usuário possui credenciais válidas
     Quando ele realiza o login
     Então um token JWT é retornado com sucesso
 
-Cenário: Acessar endpoint de dados do usuário com token válido
+Cenário 02: Acessar endpoint de monitoramento de agua
+    [Documentation]    Esse teste realiza o acesso ao endpoint de monitoramento de agua
     [Tags]    @monitoramento-agua
     Dado que o usuário está autenticado
     Quando ele acessa o endpoint de dados do usuário
     Então a resposta deve conter status 200
 
-Cenário: Acessar endpoint de dados financeiros com token válido
+Cenário 03: Acessar endpoint de monitoramento de ar
+    [Documentation]    Esse teste realiza o acesso ao endpoint de monitoramento de ar
     [Tags]    @monitoramento-ar
     Dado que o usuário está autenticado
     Quando ele acessa o endpoint de dados financeiros
     Então a resposta deve conter status 200
 
-Cenário: Acessar endpoint de histórico com token válido
+Cenário 04: Acessar endpoint de historico da agua
+    [Documentation]    Esse teste realiza o acesso ao endpoint de historico da agua
     [Tags]    @historico-agua
     Dado que o usuário está autenticado
     Quando ele acessa o endpoint de histórico

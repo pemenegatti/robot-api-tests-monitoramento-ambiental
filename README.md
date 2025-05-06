@@ -29,12 +29,12 @@ Antes de começar, certifique-se de ter os seguintes requisitos atendidos:
 ### 🚀 Como executar
 ### 1 Clone este repositório.
 ```bash
-git clone git@github.com:pemenegatti/api-test-automation-robot-framework-selenium.git
+git clone git@github.com:pemenegatti/robot-api-tests-monitoramento-ambiental.git
 ```
 
 ### 2 Acesse a pasta do projeto.
 ```bash
-cd api-test-automation-robot-framework-selenium
+cd robot-api-tests-monitoramento-ambiental
 ```
 
 ### 3 Instale os requisitos do projeto.
