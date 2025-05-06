@@ -20,7 +20,7 @@ on:
       parallel_execution:
         description: 'Executar testes em paralelo (true/false)'
         required: true
-        default: 'true'
+        default: 'false'
       SO:
         description: 'Infome o Sistema Operacional desejado (ubuntu/macos)'
         required: true
