@@ -1,0 +1,96 @@
+name: Rodar Cenários de Teste API
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+    inputs:
+      EXECUTION_ENVIRONMENT:
+        description: 'Ambiente de Execução HML ou PROD'
+        required: true
+        default: 'HML'
+      BASE_URL:
+        description: 'Base URL to run the tests against'
+        required: true
+        default: 'http://localhost:8080'
+      test_tag:
+        description: 'Tag dos cenários de teste a serem executados'
+        required: true
+        default: 'regressivo'
+      parallel_execution:
+        description: 'Executar testes em paralelo (true/false)'
+        required: true
+        default: 'true'
+      SO:
+        description: 'Infome o Sistema Operacional desejado (ubuntu/macos)'
+        required: true
+        default: 'ubuntu'
+
+jobs:
+    test:
+        runs-on: ${{ github.event.inputs.SO }}-latest
+        continue-on-error: true
+
+        steps:
+        - name: Get Code
+          uses: actions/checkout@v4
+
+        - name: Set up Python
+          uses: actions/setup-python@v5
+          with:
+            python-version: '3.11'
+
+        - name: Install dependencies
+          run: |
+            if [[ "${{ github.event.inputs.SO }}" == "ubuntu" ]]; then
+              sudo apt-get update
+              sudo apt-get install -y xvfb
+              python -m pip install --upgrade pip
+              pip install -r requirements.txt
+            else
+              python -m pip install --upgrade pip
+              pip install -r requirements.txt
+            fi
+        
+        - name: Definir o modo de execução
+          run: |
+            if [[ "${{ github.event.inputs.parallel_execution }}" == "true" ]]; then
+                echo "EXECUTION_MODE=Paralelo" >> $GITHUB_ENV
+            else
+                echo "EXECUTION_MODE=Sequencial" >> $GITHUB_ENV
+            fi
+
+        - name: Run tests
+          env:
+            EXECUTION_ENVIRONMENT: ${{ github.event.inputs.EXECUTION_ENVIRONMENT }}
+            BASE_URL: ${{ github.event.inputs.BASE_URL }}
+          run: |
+            # Definir executor baseado na opção de execução paralela
+            if [[ "${{ github.event.inputs.parallel_execution }}" == "true" ]]; then
+                EXECUTOR="pabot"
+            else
+                EXECUTOR="robot"
+            fi
+
+            # Executar os testes
+            if [[ -z "${{ github.event.inputs.test_tag }}" ]]; then
+                echo "Running all tests"
+                "$EXECUTOR" -d tests/results tests
+            else
+                echo "Running tests with tag: ${{ github.event.inputs.test_tag }}"
+                "$EXECUTOR" -d tests/results --include "${{ github.event.inputs.test_tag }}" tests
+            fi
+        
+        - name: Robot Reporter
+          if: ${{ contains(github.event.inputs.SO, 'ubuntu') && always() }}
+          uses: joonvena/robotframework-reporter-action@v2.4
+          with:
+            gh_access_token: ${{secrets.GITHUB_TOKEN}}
+            report_path: tests/results
+        
+        - name: Upload Report
+          uses: actions/upload-artifact@v4.3.3
+          if: always()
+          with:
+            name: Test Report
+            path: tests/results
